@@ -14,7 +14,8 @@ class ToDoRepositoryImpl @Inject constructor(private val webServices: WebService
         request.let {
             if (it.isSuccessful){
                 it.body()?.let {body->
-                    resource=Resource.Success(body)
+                   // resource=Resource.Success(body)
+                    resource=Resource.Error("Some thing went wrong")
                 }
             }else{
                 resource=Resource.Error("Some thing went wrong")

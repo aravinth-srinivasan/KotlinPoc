@@ -9,7 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class ToDoViewModel @Inject constructor(private val toDoRepository: ToDoRepository):ViewModel() {
+class ToDoViewModel @Inject constructor(val toDoRepository: ToDoRepository):ViewModel() {
 
 
     fun getToDoResponse(id:Int) = liveData(Dispatchers.IO) {
@@ -19,8 +19,8 @@ class ToDoViewModel @Inject constructor(private val toDoRepository: ToDoReposito
 
 
     fun getToDoResponseFlow(id:Int)= flow {
-        emit(Resource.Loading<ToDoResponse>())
-        emit(Resource.Success(toDoRepository.getToDoResponse(id)))
+        //emit(Resource.Loading())
+        emit(toDoRepository.getToDoResponse(id))
     }
 
 
