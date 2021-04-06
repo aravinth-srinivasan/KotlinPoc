@@ -9,6 +9,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import javax.inject.Named
 import javax.inject.Singleton
 
 
@@ -17,7 +18,7 @@ class NetModule {
 
     @Singleton
     @Provides
-    fun provideRetrofit():Retrofit{
+    fun provideClient():OkHttpClient{
         val okHttpClient = OkHttpClient.Builder()
         okHttpClient.apply {
             addInterceptor(HttpLoggingInterceptor().apply {
@@ -30,19 +31,44 @@ class NetModule {
             followSslRedirects(false)
 
         }
-        val client = okHttpClient.build()
+        return okHttpClient.build()
+    }
 
+    @Singleton
+    @Provides
+    @Named("todoRetrofit")
+    fun provideRetrofitForTodo():Retrofit{
         return Retrofit.Builder()
             .baseUrl("https://jsonplaceholder.typicode.com/")
             .addConverterFactory(GsonConverterFactory.create())
-            .client(client)
+            .client(provideClient())
             .build()
     }
 
     @Singleton
     @Provides
+    @Named("todoWebServices")
     fun provideWebServices():WebServices{
-        return provideRetrofit().create(WebServices::class.java)
+        return provideRetrofitForTodo().create(WebServices::class.java)
+    }
+
+
+    @Singleton
+    @Provides
+    @Named("UnSplashRetrofit")
+    fun provideRetrofitForUnSplash():Retrofit{
+        return Retrofit.Builder()
+            .baseUrl("https://api.unsplash.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(provideClient())
+            .build()
+    }
+
+    @Singleton
+    @Provides
+    @Named("UnSplashServices")
+    fun provideWebServicesForUnSplash():WebServices{
+        return provideRetrofitForTodo().create(WebServices::class.java)
     }
 
 }

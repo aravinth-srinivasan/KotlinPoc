@@ -9,11 +9,8 @@ import com.raweng.kotlinpoc.databinding.ActivityToDoBinding
 import com.raweng.kotlinpoc.utils.Resource
 import com.raweng.kotlinpoc.view.todo.viewModel.ToDoViewModel
 import dagger.android.support.DaggerAppCompatActivity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 class ToDoActivity : DaggerAppCompatActivity() {
@@ -25,7 +22,8 @@ class ToDoActivity : DaggerAppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding=DataBindingUtil.setContentView(this,R.layout.activity_to_do)
-        getParallelRequest1()
+       // getParallelRequest1()
+        getParallelRequest4()
     }
 
 
@@ -87,6 +85,26 @@ class ToDoActivity : DaggerAppCompatActivity() {
                             }
                         }
                     }
+            }
+        }
+    }
+
+
+    private  fun getParallelRequest4(){
+
+        CoroutineScope(Dispatchers.IO).launch {
+            viewModel.getParallelRequest4().collect {
+                when (it) {
+                    is Resource.Success -> {
+                        Log.e("TAG", "onCreate: Data Flow Success 1")
+                    }
+                    is Resource.Loading -> {
+                        Log.e("TAG", "onCreate: Data Flow Loading 1")
+                    }
+                    is Resource.Error -> {
+                        Log.e("TAG", "onCreate: Data Flow Error 1")
+                    }
+                }
             }
         }
     }
