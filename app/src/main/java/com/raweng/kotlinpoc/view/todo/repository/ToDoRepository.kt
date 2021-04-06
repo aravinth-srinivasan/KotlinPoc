@@ -6,5 +6,6 @@ import com.raweng.kotlinpoc.view.todo.model.ToDoResponse
 interface ToDoRepository {
 
     fun getToDoResponse(id:Int): Resource<ToDoResponse>
+    suspend fun getToDoRes(id:Int): Resource<ToDoResponse>
 
 }

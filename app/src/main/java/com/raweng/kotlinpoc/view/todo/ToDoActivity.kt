@@ -2,15 +2,19 @@ package com.raweng.kotlinpoc.view.todo
 
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import com.raweng.kotlinpoc.R
 import com.raweng.kotlinpoc.databinding.ActivityToDoBinding
+import com.raweng.kotlinpoc.utils.Coroutines
 import com.raweng.kotlinpoc.utils.Resource
 import com.raweng.kotlinpoc.view.todo.viewModel.ToDoViewModel
 import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import java.lang.StringBuilder
 import javax.inject.Inject
 
 class ToDoActivity : DaggerAppCompatActivity() {
@@ -22,84 +26,45 @@ class ToDoActivity : DaggerAppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding=DataBindingUtil.setContentView(this,R.layout.activity_to_do)
-       // getParallelRequest1()
-        getParallelRequest4()
+        getSingleRequest()
+        getParallelRequest5()
     }
 
-
-   private fun getParallelRequest1(){
-        for (i in 1..5) {
-            viewModel.getToDoResponse(i).observe(this, Observer {
-                when (it) {
-                    is Resource.Success -> {
-                        Log.e("TAG", "onCreate: Data Success")
-                    }
-                    is Resource.Loading -> {
-                        Log.e("TAG", "onCreate: Data Loading")
-                    }
-                    is Resource.Error -> {
-                        Log.e("TAG", "onCreate: Data Error")
-                    }
-                }
-            })
-
-        }
-    }
-
-    private fun getParallelRequest2(){
-        for (i in 1..5) {
-
-            CoroutineScope(Dispatchers.IO).launch {
-                viewModel.getToDoResponseFlow(i).collect {
-                    when (it) {
-                        is Resource.Success -> {
-                            Log.e("TAG", "onCreate: Data Flow Success")
-                        }
-                        is Resource.Loading -> {
-                            Log.e("TAG", "onCreate: Data Flow Loading")
-                        }
-                        is Resource.Error -> {
-                            Log.e("TAG", "onCreate: Data Flow Error")
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-   private fun getParallelRequest3(){
-
-        runBlocking {
-            (1..5).asFlow().map { it ->
-                viewModel.getToDoResponseFlow(it)
-                    .collect {
-                        when (it) {
-                            is Resource.Success -> {
-                                Log.e("TAG", "onCreate: Data Flow Success 1")
-                            }
-                            is Resource.Loading -> {
-                                Log.e("TAG", "onCreate: Data Flow Loading 1")
-                            }
-                            is Resource.Error -> {
-                                Log.e("TAG", "onCreate: Data Flow Error 1")
-                            }
-                        }
-                    }
-            }
-        }
-    }
-
-
-    private  fun getParallelRequest4(){
-
+    private  fun getParallelRequest5(){
         CoroutineScope(Dispatchers.IO).launch {
-            viewModel.getParallelRequest4().collect {
+            viewModel.getParallelRequest5().collect{ it ->
                 when (it) {
                     is Resource.Success -> {
-                        Log.e("TAG", "onCreate: Data Flow Success 1")
+                        val data=StringBuilder("")
+                        withContext(Dispatchers.Main) {
+                            it.data?.forEach { it ->
+                                when (it) {
+                                    is Resource.Success -> {
+                                        hideLoading()
+                                        it.data?.let {
+                                            Log.e("TAG", "getParallelRequest5: ${it.title}")
+                                            data.append(it.title)
+                                            data.append("\n")
+                                            binding.tvParallelData.text=data.toString()
+                                        }
+                                    }
+
+                                    is Resource.Loading -> {
+                                        showLoading()
+                                    }
+                                    is Resource.Error -> {
+                                        Toast.makeText(this@ToDoActivity, it.message, Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            }
+                        }
+
                     }
                     is Resource.Loading -> {
-                        Log.e("TAG", "onCreate: Data Flow Loading 1")
+                        withContext(Dispatchers.Main){
+                            binding.vsLoading.viewStub?.inflate()
+                        }
+
                     }
                     is Resource.Error -> {
                         Log.e("TAG", "onCreate: Data Flow Error 1")
@@ -107,6 +72,45 @@ class ToDoActivity : DaggerAppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun getSingleRequest(){
+        Coroutines.main {
+            viewModel.getToDoReq(1).observe(this, Observer { it ->
+                when(it){
+                    is Resource.Success -> {
+                        it.data?.let {
+                            hideLoading()
+                            binding.tvTitle.text=it.title
+                            binding.tvContent.text=it.body
+                        }
+                    }
+                    is Resource.Loading -> {
+                        showLoading()
+                    }
+                    is Resource.Error -> {
+                        hideLoading()
+                        Log.e("TAG", "getSingleRequest: Error" )
+                    }
+                }
+            })
+        }
+    }
+
+
+    private fun getParallelRequest(){
+        Coroutines.main {
+
+        }
+    }
+
+
+    private fun showLoading(){
+        binding.vsLoading.viewStub?.inflate()
+    }
+
+    private fun hideLoading(){
+        binding.vsLoading.root.visibility=View.GONE
     }
 
 }
