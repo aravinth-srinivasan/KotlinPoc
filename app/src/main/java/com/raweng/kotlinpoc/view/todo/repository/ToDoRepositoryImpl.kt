@@ -4,6 +4,7 @@ import android.util.Log
 import com.raweng.kotlinpoc.api.WebServices
 import com.raweng.kotlinpoc.utils.Resource
 import com.raweng.kotlinpoc.utils.SafeApiRequest
+import com.raweng.kotlinpoc.view.todo.model.ImageResponse
 import com.raweng.kotlinpoc.view.todo.model.ToDoResponse
 import javax.inject.Inject
 import javax.inject.Named
@@ -29,6 +30,10 @@ class ToDoRepositoryImpl @Inject constructor(private  val webServices: WebServic
     override suspend fun getToDoRes(id: Int): Resource<ToDoResponse> {
         Log.e("TAG", "getToDoRes: Call")
         return apiRequest { webServices.getToDoListRes(id) }
+    }
+
+    suspend fun getRes():Resource<ImageResponse> {
+        return apiRequest { webServices.getUnSplash1() }
     }
 
 

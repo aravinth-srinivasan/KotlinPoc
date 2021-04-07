@@ -10,8 +10,6 @@ import javax.inject.Inject
 
 class ToDoViewModel @Inject constructor(private val toDoRepository: ToDoRepository) : ViewModel() {
 
-
-
     fun getParallelRequest5() = flow {
         val f1 = flowOf(toDoRepository.getToDoResponse(1))
         val f2 = flowOf(toDoRepository.getToDoResponse(2))
@@ -30,6 +28,8 @@ class ToDoViewModel @Inject constructor(private val toDoRepository: ToDoReposito
                     emit(Resource.Success(it))
                 }
     }
+
+
 
 
 

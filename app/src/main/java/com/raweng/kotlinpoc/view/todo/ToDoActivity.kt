@@ -1,116 +1,130 @@
 package com.raweng.kotlinpoc.view.todo
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
+import androidx.lifecycle.asLiveData
 import com.raweng.kotlinpoc.R
 import com.raweng.kotlinpoc.databinding.ActivityToDoBinding
-import com.raweng.kotlinpoc.utils.Coroutines
 import com.raweng.kotlinpoc.utils.Resource
+import com.raweng.kotlinpoc.view.todo.model.ToDoResponse
 import com.raweng.kotlinpoc.view.todo.viewModel.ToDoViewModel
 import dagger.android.support.DaggerAppCompatActivity
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-import java.lang.StringBuilder
+import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 
 class ToDoActivity : DaggerAppCompatActivity() {
 
     @Inject
     lateinit var viewModel: ToDoViewModel
-    lateinit var binding:ActivityToDoBinding
+    lateinit var binding: ActivityToDoBinding
+    private val data = StringBuilder("")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding=DataBindingUtil.setContentView(this,R.layout.activity_to_do)
-        getSingleRequest()
-        getParallelRequest5()
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_to_do)
+        initRequests()
     }
 
-    private  fun getParallelRequest5(){
-        CoroutineScope(Dispatchers.IO).launch {
-            viewModel.getParallelRequest5().collect{ it ->
-                when (it) {
-                    is Resource.Success -> {
-                        val data=StringBuilder("")
-                        withContext(Dispatchers.Main) {
-                            it.data?.forEach { it ->
-                                when (it) {
-                                    is Resource.Success -> {
-                                        hideLoading()
-                                        it.data?.let {
-                                            Log.e("TAG", "getParallelRequest5: ${it.title}")
-                                            data.append(it.title)
-                                            data.append("\n")
-                                            binding.tvParallelData.text=data.toString()
-                                        }
-                                    }
 
-                                    is Resource.Loading -> {
-                                        showLoading()
-                                    }
-                                    is Resource.Error -> {
-                                        Toast.makeText(this@ToDoActivity, it.message, Toast.LENGTH_SHORT).show()
-                                    }
-                                }
-                            }
-                        }
+    private fun initRequests() {
+        getSingleRequest()
+        getParallelRequest()
+    }
 
-                    }
-                    is Resource.Loading -> {
-                        withContext(Dispatchers.Main){
-                            binding.vsLoading.viewStub?.inflate()
-                        }
 
-                    }
-                    is Resource.Error -> {
-                        Log.e("TAG", "onCreate: Data Flow Error 1")
-                    }
+    private fun getSingleRequest() {
+        viewModel.getToDoReq(1).observe(this, Observer {
+            onSingleRequestHandler(it)
+        })
+
+    }
+
+
+    private fun getParallelRequest() {
+        viewModel.getParallelRequest5().asLiveData(Dispatchers.IO).observe(this, Observer {
+            onParallelRequestObserver(it)
+        })
+    }
+
+
+    private fun onParallelRequestObserver(response: Resource<out MutableList<Resource<ToDoResponse>>>) {
+        when (response) {
+            is Resource.Success -> {
+                hideLoading()
+                response.data?.forEach {
+                    onEachItemResponseHandler(it)
                 }
+            }
+            is Resource.Loading -> {
+                showLoading()
+            }
+            is Resource.Error -> {
+
             }
         }
     }
 
-    private fun getSingleRequest(){
-        Coroutines.main {
-            viewModel.getToDoReq(1).observe(this, Observer { it ->
-                when(it){
-                    is Resource.Success -> {
-                        it.data?.let {
-                            hideLoading()
-                            binding.tvTitle.text=it.title
-                            binding.tvContent.text=it.body
-                        }
-                    }
-                    is Resource.Loading -> {
-                        showLoading()
-                    }
-                    is Resource.Error -> {
-                        hideLoading()
-                        Log.e("TAG", "getSingleRequest: Error" )
-                    }
+
+    private fun onEachItemResponseHandler(response: Resource<ToDoResponse>) {
+        when (response) {
+            is Resource.Success -> {
+                response.data?.let {
+                    onEachItemSuccessResponseHandle(it)
                 }
-            })
+            }
+
+            is Resource.Loading -> {
+
+            }
+            is Resource.Error -> {
+                Toast.makeText(this@ToDoActivity, response.message, Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
 
-    private fun getParallelRequest(){
-        Coroutines.main {
+    private fun onEachItemSuccessResponseHandle(response:ToDoResponse){
+        data.append(response.title)
+        data.append("\n")
+        binding.tvParallelData.text = data.toString()
+    }
 
+    private fun onSingleRequestHandler(resource: Resource<ToDoResponse>) {
+        when (resource) {
+            is Resource.Success -> {
+                hideLoading()
+                resource.data?.let {
+                    onSingleRequestSuccessHandler(it)
+                }
+            }
+            is Resource.Loading -> {
+                showLoading()
+            }
+            is Resource.Error -> {
+                hideLoading()
+            }
         }
     }
 
 
-    private fun showLoading(){
+    private fun onSingleRequestSuccessHandler(data:ToDoResponse){
+            binding.tvTitle.text = data.title
+            binding.tvContent.text = data.body
+
+    }
+
+
+    private fun showLoading() {
         binding.vsLoading.viewStub?.inflate()
     }
 
-    private fun hideLoading(){
-        binding.vsLoading.root.visibility=View.GONE
+    private fun hideLoading() {
+        binding.vsLoading.root?.apply {
+            visibility = View.GONE
+        }
     }
 
 }

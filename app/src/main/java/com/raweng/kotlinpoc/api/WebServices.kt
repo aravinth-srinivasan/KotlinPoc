@@ -23,4 +23,9 @@ interface WebServices {
     @GET("photos")
     fun getUnSplash(@Query("client_id") client_id:String="sNx1UrXmX8qMQXNSy-zYxNx9_aYGZUI_RFU8YSAVbkI"):Call<ImageResponse>
 
+
+    @Headers("Accept-Version: v1")
+    @GET("photos")
+    fun getUnSplash1(@Query("client_id") client_id:String="sNx1UrXmX8qMQXNSy-zYxNx9_aYGZUI_RFU8YSAVbkI"):Response<ImageResponse>
+
 }
