@@ -1,7 +1,7 @@
-package com.raweng.kotlinpoc.view.todo.repository
+package com.raweng.kotlinpoc.view.todo.domain.repository
 
 import com.raweng.kotlinpoc.utils.Resource
-import com.raweng.kotlinpoc.view.todo.model.ToDoResponse
+import com.raweng.kotlinpoc.view.todo.data.model.ToDoResponse
 
 interface ToDoRepository {
 

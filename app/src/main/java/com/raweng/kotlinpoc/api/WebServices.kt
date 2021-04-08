@@ -1,7 +1,7 @@
 package com.raweng.kotlinpoc.api
 
-import com.raweng.kotlinpoc.view.todo.model.ImageResponse
-import com.raweng.kotlinpoc.view.todo.model.ToDoResponse
+import com.raweng.kotlinpoc.view.todo.data.model.ImageResponse
+import com.raweng.kotlinpoc.view.todo.data.model.ToDoResponse
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.GET

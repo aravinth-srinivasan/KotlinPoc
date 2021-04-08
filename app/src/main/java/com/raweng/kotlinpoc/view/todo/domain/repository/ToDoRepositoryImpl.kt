@@ -1,15 +1,15 @@
-package com.raweng.kotlinpoc.view.todo.repository
+package com.raweng.kotlinpoc.view.todo.domain.repository
 
 import android.util.Log
 import com.raweng.kotlinpoc.api.WebServices
 import com.raweng.kotlinpoc.utils.Resource
 import com.raweng.kotlinpoc.utils.SafeApiRequest
-import com.raweng.kotlinpoc.view.todo.model.ImageResponse
-import com.raweng.kotlinpoc.view.todo.model.ToDoResponse
+import com.raweng.kotlinpoc.view.todo.data.model.ImageResponse
+import com.raweng.kotlinpoc.view.todo.data.model.ToDoResponse
 import javax.inject.Inject
 import javax.inject.Named
 
-class ToDoRepositoryImpl @Inject constructor(private  val webServices: WebServices):ToDoRepository,SafeApiRequest() {
+class ToDoRepositoryImpl @Inject constructor(private  val webServices: WebServices): ToDoRepository,SafeApiRequest() {
 
 
     override fun getToDoResponse(id:Int): Resource<ToDoResponse> {

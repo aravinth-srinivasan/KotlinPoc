@@ -1,4 +1,4 @@
-package com.raweng.kotlinpoc.view.todo
+package com.raweng.kotlinpoc.view.todo.presentation
 
 import android.os.Bundle
 import android.view.View
@@ -9,8 +9,7 @@ import androidx.lifecycle.asLiveData
 import com.raweng.kotlinpoc.R
 import com.raweng.kotlinpoc.databinding.ActivityToDoBinding
 import com.raweng.kotlinpoc.utils.Resource
-import com.raweng.kotlinpoc.view.todo.model.ToDoResponse
-import com.raweng.kotlinpoc.view.todo.viewModel.ToDoViewModel
+import com.raweng.kotlinpoc.view.todo.data.model.ToDoResponse
 import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
@@ -86,7 +85,7 @@ class ToDoActivity : DaggerAppCompatActivity() {
     }
 
 
-    private fun onEachItemSuccessResponseHandle(response:ToDoResponse){
+    private fun onEachItemSuccessResponseHandle(response: ToDoResponse){
         data.append(response.title)
         data.append("\n")
         binding.tvParallelData.text = data.toString()
@@ -110,7 +109,7 @@ class ToDoActivity : DaggerAppCompatActivity() {
     }
 
 
-    private fun onSingleRequestSuccessHandler(data:ToDoResponse){
+    private fun onSingleRequestSuccessHandler(data: ToDoResponse){
             binding.tvTitle.text = data.title
             binding.tvContent.text = data.body
 

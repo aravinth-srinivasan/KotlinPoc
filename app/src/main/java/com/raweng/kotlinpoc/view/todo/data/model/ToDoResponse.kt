@@ -1,4 +1,4 @@
-package com.raweng.kotlinpoc.view.todo.model
+package com.raweng.kotlinpoc.view.todo.data.model
 
 data class ToDoResponse(
     val body: String,
